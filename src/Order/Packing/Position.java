@@ -5,6 +5,8 @@
  */
 package Order.Packing;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import order.exceptions.PositionException;
 import order.packing.IPosition;
 
@@ -24,9 +26,13 @@ public class Position implements IPosition{
     private int z;
 
     public Position(int x, int y, int z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        try {
+            setX(x);
+            setY(y);
+            setZ(z);
+        } catch (PositionException ex) {
+            Logger.getLogger(Position.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     
@@ -46,18 +52,18 @@ public class Position implements IPosition{
     }
 
     @Override
-    public void setX(int i) throws PositionException {
-        this.x = i;
+    public void setX(int x) throws PositionException {
+        this.x = x;
     }
 
     @Override
-    public void setY(int i) throws PositionException {
-        this.y = i;
+    public void setY(int y) throws PositionException {
+        this.y = y;
     }
 
     @Override
-    public void setZ(int i) throws PositionException {
-        this.z = i;
+    public void setZ(int z) throws PositionException {
+        this.z = z;
     }
     
 }

@@ -22,8 +22,8 @@ public class Person implements IPerson {
     private String name;
 
     public Person(IAddress tempAddress, String tempName) {
-        this.address = tempAddress;
-        this.name = tempName;
+        setAddress(tempAddress);
+        setName(tempName);
     }
 
     @Override
@@ -37,13 +37,13 @@ public class Person implements IPerson {
     }
 
     @Override
-    public void setAddress(IAddress ia) {
-        this.address = ia;
+    public void setAddress(IAddress address) {
+        this.address = address;
     }
 
     @Override
-    public void setName(String string) {
-        this.name = string;
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

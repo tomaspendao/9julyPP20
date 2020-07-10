@@ -21,12 +21,11 @@ import order.packing.IPosition;
 * Nome: 
 * Número: 
  */
-public class Container implements IContainer{
+public class Container implements IContainer {
 
-    //private IItem item;
+    private static final int MAX_ITENS_P = 10;
     private IItemPacked[] packedItems;
-    private String reference;
-    //private int numberOfItems;
+    private final String reference;
     private final int volume;
     private final int depth;  //--> x
     private final int height; //--> y
@@ -36,12 +35,11 @@ public class Container implements IContainer{
     private int currentVolume;
 
     private boolean isClosed;
+    private int currentNumberOfItems;
 
-    public Container(IItemPacked[] packedItems, String reference, int volume, int lenght, int height, int depth, Color color, Color colorEdge, boolean isClosed) {
-        this.packedItems = packedItems;
+    public Container(String reference, int volume, int lenght, int height, int depth, Color color, Color colorEdge, boolean isClosed) {
+        packedItems = new IItemPacked[MAX_ITENS_P];
         this.reference = reference;
-        //this.numberOfItems = numberOfItems; 
-        //this.numberOfItems = packedItems.length; //^|^ ??
         this.volume = volume;
         this.lenght = lenght;
         this.height = height;
@@ -54,43 +52,76 @@ public class Container implements IContainer{
         }
     }
 
+    public Container(String reference, int volume, int lenght, int height, int depth, Color color, Color colorEdge, boolean isClosed, int occupiedVolume) {
+        packedItems = new IItemPacked[MAX_ITENS_P];
+        this.reference = reference;
+        this.volume = volume;
+        this.lenght = lenght;
+        this.height = height;
+        this.depth = depth;
+        this.color = color;
+        this.colorEdge = colorEdge;
+        this.isClosed = isClosed;
+        this.currentVolume = occupiedVolume;
+    }
+
     @Override
     public boolean addItem(IItem iitem, IPosition ip, Color color) throws ContainerException {
 
-        for (int j = 0; j < packedItems.length; j++) {
-            if (packedItems[j].getItem() == iitem) {
+        for (int j = 0; j < currentNumberOfItems; j++) {//se o item ja existe
+            if (packedItems[j].getItem().getReference().equals(iitem.getReference()) == true) {
                 return false;
             }
         }
-        for (int i = 0; i < packedItems.length; i++) {
-            if (packedItems[i] == null) {
-                IItemPacked tempPacked = new ItemPacked(iitem, ip, color);
-                packedItems[i] = tempPacked;
-                int plusVolume = iitem.getVolume();
-                this.currentVolume = this.currentVolume + plusVolume;
-                return true;
+
+        if (currentNumberOfItems >= packedItems.length) {
+            int size = packedItems.length;
+            size = size * 2;
+            IItemPacked[] temp = new IItemPacked[size];
+            for (int k = 0; k < packedItems.length; k++) {
+                temp[k] = packedItems[k];
             }
-            IItemPacked[] temp;
-            int newInt = packedItems.length;
-            newInt = newInt * 2;
-            temp = new IItemPacked[newInt];
             packedItems = temp;
-            addItem(iitem, ip, color);
         }
-        return false;
+        if (iitem == null || isClosed() == true) {
+            throw new ContainerException() {
+            };
+        } else {
+            IItemPacked NItem = new ItemPacked(iitem, ip, color);
+            packedItems[currentNumberOfItems] = NItem;
+            int plusVolume = iitem.getVolume();
+            this.currentVolume = this.currentVolume + plusVolume;
+            currentNumberOfItems++;
+            return true;
+        }
     }
 
     @Override
     public boolean removeItem(IItem iitem) throws ContainerException {
-        for (int i = 0; i < packedItems.length; i++) {
-            if (packedItems[i].getItem() == iitem) {
-                int lessVolume = packedItems[i].getItem().getVolume();
-                packedItems[i] = null;
-                this.currentVolume = this.currentVolume - lessVolume;
-                return true;
+        if (iitem == null || isClosed() == true) {
+            throw new ContainerException() {
+            };
+        }
+        int k;
+        for (int i = 0; i < currentNumberOfItems; i++) {
+            if (packedItems[i].getItem().getReference().equals(iitem.getReference()) == true) {
+                k = i;
+                for (int j = k; j < currentNumberOfItems; j++) {
+                    k++;
+                    if (k >= currentNumberOfItems) {
+                        int lessVolume = packedItems[i].getItem().getVolume();
+                        packedItems[j] = null;
+                        this.currentVolume = this.currentVolume - lessVolume;
+                        currentNumberOfItems--;
+                        return true;
+                    }
+                    packedItems[j] = packedItems[k];
+                }
             }
+
         }
         return false;
+
     }
 
     @Override
@@ -100,19 +131,21 @@ public class Container implements IContainer{
             };
         }
         for (int i = 0; i < packedItems.length; i++) {
-            if (packedItems[i].getPosition().getX() > depth 
+            if (packedItems[i].getPosition().getX() > depth
                     || packedItems[i].getPosition().getY() > height
                     || packedItems[i].getPosition().getZ() > lenght) {//verificar se todos os itens se encontram dentro do container
-                throw new PositionException("Item out of container, overflowing") {};
+                throw new PositionException("Item out of container, overflowing") {
+                };
             }
             for (int j = 0; j < packedItems.length; j++) { //varificar sobreposiçaõ de intems
-                if(packedItems[i].getPosition().getX() == packedItems[j].getPosition().getX()
+                if (packedItems[i].getPosition().getX() == packedItems[j].getPosition().getX()
                         || packedItems[i].getPosition().getY() == packedItems[j].getPosition().getY()
-                        || packedItems[i].getPosition().getZ() == packedItems[j].getPosition().getZ()){
-                    throw new PositionException("Items overlapping"){};
-                    
+                        || packedItems[i].getPosition().getZ() == packedItems[j].getPosition().getZ()) {
+                    throw new PositionException("Items overlapping") {
+                    };
+
                 }
-                if(j==i){
+                if (j == i) {
                     j++;
                 }
             }
@@ -121,7 +154,7 @@ public class Container implements IContainer{
 
     @Override
     public void close() throws ContainerException, PositionException {
-        
+
         if (isClosed != true) { //como confirmar...
             validate(); // saber se se pode fechar //?????????
             isClosed = true;
@@ -137,7 +170,7 @@ public class Container implements IContainer{
         }
         return null;
     }
-    
+
     @Override
     public int getOccupiedVolume() {
         int totalVolume = 0;
@@ -223,7 +256,5 @@ public class Container implements IContainer{
     public void setColorEdge(Color color) {
         this.colorEdge = color;
     }
-
-    
 
 }

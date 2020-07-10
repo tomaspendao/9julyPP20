@@ -17,48 +17,67 @@ import order.management.IOrder;
 *
 * Nome: 
 * Número: 
-*/
+ */
+public class Management implements IManagement {
 
-public class Management implements IManagement{
-    
+    private static final int MAX_ORDERS = 10;
     private IOrder[] orders;
+    private int currentNOrders = 0;
 
-    public Management(IOrder[] orders) {
-        this.orders = orders;
+    public Management() {
+        orders = new IOrder[MAX_ORDERS];
     }
 
-    
     @Override
     public boolean add(IOrder iorder) throws OrderException {
-        for (int i = 0; i < orders.length; i++) {
-            if(orders[i] == iorder){
+        for (int i = 0; i < currentNOrders; i++) {
+            if (orders[i].getId() == iorder.getId()) {
                 return false;
             }
         }
-        for (int i = 0; i < orders.length; i++) {
-            if(orders[i] == null){
-                orders[i] = iorder;
-                return true;
+        if (currentNOrders >= orders.length) {
+            int size = orders.length;
+            size++;
+            IOrder[] temp = new IOrder[size];
+            int k = 0;
+            while (k < orders.length) {
+                temp[k] = orders[k];
+                k++;
             }
+            orders = temp;
         }
-        //adicionar posição
-        int size = orders.length;
-        size++;
-        IOrder[] temp;
-        temp = new IOrder[size];
-        orders = temp;
-        
-        add(iorder);
-        
-        return false;
+        if (iorder != null) {
+            orders[currentNOrders] = iorder;
+            currentNOrders++;
+            return true;
+        } else {
+            throw new OrderException("value cant be null") {};
+        }
     }
 
     @Override
     public boolean remove(IOrder iorder) throws OrderException {
-        for (int i = 0; i < orders.length; i++) {
-            if(orders[i] == iorder){
-                orders[i] = null;
-                return true;
+        int i = 0;
+        int k;
+        if(iorder==null){
+            throw new OrderException("value cant be null") {};//ver se o iorder e null
+        }
+        while (i < currentNOrders) {
+            if (orders[i].getId() == iorder.getId()) { //ver se a order existe
+                k = i;
+                for (int j = k; j < currentNOrders; j++) {//fazer rollback
+                    k++;
+                    if(k>=currentNOrders){
+                        orders[j] = null; //"apagar o ultimo valor"
+                        currentNOrders--;
+                        return true; //?????????????????????????
+                    }
+                    orders[j] = orders[k];
+                }
+                //currentNOrders--;
+                //return true;
+            } else {
+                i++;
             }
         }
         return false;
@@ -67,7 +86,7 @@ public class Management implements IManagement{
     @Override
     public IOrder[] getOrders(ICustomer ic) {
         for (int i = 0; i < orders.length; i++) {
-            if(orders[i].getCustomer() == ic){
+            if (orders[i].getCustomer() == ic) {
                 return orders;
             }
         }
@@ -78,5 +97,5 @@ public class Management implements IManagement{
     public IOrder[] getOrders() {
         return orders;
     }
-    
+
 }

@@ -25,13 +25,13 @@ public class Item extends Box implements IItem {
     public Item(String reference, String description, int depth, int height, int lenght, int volume) {
         super(depth, height, lenght, volume);
         this.reference = reference;
-        this.description = description;
+        setDescription(description);
     }
 
     public Item(String reference, String description, int depth, int height, int lenght) {
         super(depth, height, lenght);
         this.reference = reference;
-        this.description = description;
+        setDescription(description);
     }
 
     @Override
@@ -45,8 +45,8 @@ public class Item extends Box implements IItem {
     }
 
     @Override
-    public void setDescription(String string) {
-        this.description = string;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
 

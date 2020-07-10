@@ -5,16 +5,33 @@
  */
 package Order.Management;
 
+import Order.Base.Address;
+import Order.Base.Customer;
+import Order.Base.Person;
+import Order.Packing.Container;
 import Order.Packing.Item;
+import Order.Packing.ItemPacked;
+import Order.Packing.Position;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import order.base.IAddress;
+import order.base.ICustomer;
+import order.base.IPerson;
 import order.exceptions.ContainerException;
 import order.exceptions.OrderException;
 import order.exceptions.PositionException;
 import order.management.IOrder;
 import order.management.IOrderImporter;
+import order.management.IShipping;
+import order.management.ShipmentStatus;
+import order.packing.Color;
+import order.packing.IContainer;
 import order.packing.IItem;
+import order.packing.IItemPacked;
+import order.packing.IPosition;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -34,6 +51,7 @@ public class OrderImporter implements IOrderImporter {
     }
 
     @Override
+    @SuppressWarnings("null")
     public void importData(IOrder iorder, String string) throws IOException, ParseException, ContainerException, OrderException, PositionException {
         //importar o json importado com o caminho string;
         //JSON parser object to parse read file
@@ -47,12 +65,8 @@ public class OrderImporter implements IOrderImporter {
             //System.out.println(orderList);
 
             for (Object o : orderList) {
+                
                 JSONObject order = (JSONObject) o;
-
-                //Get Id
-                int id = (int) order.get("id");
-                iorder.setId(id);
-
                 //Get date object from list
                 JSONObject dateObject = (JSONObject) order.get("date");
                 //get day from date
@@ -149,7 +163,6 @@ public class OrderImporter implements IOrderImporter {
 
                 IItem temp = new Item(reference, description, depth, height, lenght);
                 iorder.add(temp);
-                //}
             }
 
         } catch (FileNotFoundException e) {

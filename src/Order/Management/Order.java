@@ -5,6 +5,7 @@
  */
 package Order.Management;
 
+import Order.Packing.Item;
 import java.time.LocalDate;
 import java.time.Month;
 import order.base.ICustomer;
@@ -29,38 +30,43 @@ import order.packing.IItemPacked;
  */
 public class Order implements IOrder {
     
+    private static final int MAX_SHIPPING = 10;
+    private static final int MAX_ITENS = 20;
+    
     private IPerson destination;
     private ICustomer customer;
     private IItem[] items;
     private int id;
     private LocalDate date;
     private IShipping[] shippings;
-    private int numberOfItems;
-    private boolean isClosed = false;
     
+    private int numberOfItems = 0;
+    private int numberOfShippings = 0;
+    private boolean isClosed = false;
     private double orderPrice;
     
-    public Order(IPerson destination, ICustomer customer, IItem[] items, int id, LocalDate date, double orderPrice) {
-        this.destination = destination;
-        this.customer = customer;
-        this.items = items;
-        this.id = id;
-        this.date = date;
-        //this.shippings = shippings;
+    public Order(IPerson destination, ICustomer customer, int id, LocalDate date, double orderPrice) {
+        setDestination(destination);
+        setCustomer(customer);
+        setId(id);
+        setDate(date.getDayOfMonth(), date.getMonthValue(), date.getYear());
         this.numberOfItems = items.length;
         this.orderPrice = orderPrice;
+        
+        shippings = new IShipping[MAX_SHIPPING];
+        items = new IItem[MAX_ITENS];
     }
+
+    public Order(IPerson destination, ICustomer customer, int id, LocalDate date) {
+        setDestination(destination);
+        setCustomer(customer);
+        items = new IItem[MAX_ITENS];
+        setId(id);
+        setDate(date.getDayOfMonth(), date.getMonthValue(), date.getYear());
+        shippings = new IShipping[MAX_SHIPPING];
+    }
+
     
-    public Order(IPerson destination, ICustomer customer, IItem[] items, int id, LocalDate date, IShipping[] shippings, int numberOfItems, double orderPrice) {
-        this.destination = destination;
-        this.customer = customer;
-        this.items = items;
-        this.id = id;
-        this.date = date;
-        this.shippings = shippings;
-        this.numberOfItems = numberOfItems;
-        this.orderPrice = orderPrice;
-    }
     
     @Override
     public IPerson getDestination() {
@@ -68,8 +74,8 @@ public class Order implements IOrder {
     }
     
     @Override
-    public void setDestination(IPerson ip) {
-        this.destination = ip;
+    public void setDestination(IPerson person) {
+        this.destination = person;
     }
     
     @Override
@@ -78,8 +84,8 @@ public class Order implements IOrder {
     }
     
     @Override
-    public void setCustomer(ICustomer ic) {
-        this.customer = ic;
+    public void setCustomer(ICustomer customer) {
+        this.customer = customer;
     }
     
     @Override
@@ -88,8 +94,8 @@ public class Order implements IOrder {
     }
     
     @Override
-    public void setId(int i) {
-        this.id = i;
+    public void setId(int id) {
+        this.id = id;
     }
     
     @Override
@@ -98,8 +104,8 @@ public class Order implements IOrder {
     }
     
     @Override
-    public void setDate(int i, int i1, int i2) {
-        this.date = LocalDate.of(i, i1, i2);
+    public void setDate(int day, int month, int year) {
+        this.date = LocalDate.of(year, month, day);
     }
     
     @Override
@@ -109,21 +115,29 @@ public class Order implements IOrder {
     
     @Override
     public boolean add(IItem iitem) throws OrderException {
-        for (int i = 0; i < items.length; i++) {
-            if (items[i] == null) {
-                items[i] = iitem;
-                return true;
+        for (int i = 0; i < numberOfItems; i++) {
+            if (items[i].getReference().equals(iitem.getReference()) == true) {
+                return false;
             }
-            
         }
-        //adicionar posição
-        numberOfItems++;
-        IItem[] temp;
-        temp = new IItem[numberOfItems];
-        items = temp;
-        add(iitem);
-        
-        return false;
+        if(numberOfItems >= items.length){
+            int size = items.length;
+            size = size * 2;
+            IItem[] temp = new IItem[size];
+            int k = 0;
+            while (k < items.length) {
+                temp[k] = items[k];
+                k++;
+            }
+            items = temp;
+        }
+        if (iitem != null) {
+            items[numberOfItems] = iitem;
+            numberOfItems++;
+            return true;
+        }else{
+            throw new OrderException("value cant be null") {};
+        }
     }
     
     @Override
@@ -133,40 +147,39 @@ public class Order implements IOrder {
     
     @Override
     public boolean addShipping(IShipping is) throws OrderException {
-        /*for (IShipping shipping : shippings) { //shipping repetida
-            if (shipping == is) {
-                return false;
-            }
-        }*/
-        for (int i = 0; i < shippings.length; i++) { //encontrar espaço no array
-            if (shippings[i] == null) {
-                shippings[i] = is;
-                return true;
-            }
+        if (numberOfShippings >= MAX_SHIPPING) {
+            return false;
         }
-        int size = shippings.length;
-        size++;
-        IShipping[] temp;
-        temp = new IShipping[size];
-        int j;
-        for (j = 0; j < shippings.length; j++) {
-            temp[j] = shippings[j];
-        }
-        shippings = temp;
-        if (shippings[j] == null) {
-            shippings[j] = is;
+        if (isClosed() == true || is == null) {
+            throw new OrderException() {};
+        }else{
+            shippings[numberOfShippings] = is;
+            numberOfShippings++;
             return true;
         }
         
-        return false;
     }
     
     @Override
     public boolean removeShipping(IShipping is) throws OrderException {
-        for (int i = 0; i < shippings.length; i++) { //encontrar no array
-            if (shippings[i] == is) {
-                shippings[i] = null;
-                return true;
+        if(is == null){
+            throw new OrderException("value cant be null") {};
+        }
+        int k;
+        for (int i = 0; i < numberOfShippings; i++) {
+            if (shippings[i].equals(is) == true) {
+                k=i;
+                for (int j = k; j < numberOfShippings; j++) {
+                    k++;
+                    if (k >= numberOfShippings) {
+                        shippings[j] = null;
+                        numberOfShippings--;
+                        return true;
+                    }
+                    shippings[j] = shippings[k];
+                }
+                //numberOfShippings--;
+                //return true;
             }
         }
         return false;
@@ -205,9 +218,9 @@ public class Order implements IOrder {
         }
         if (count == shippings.length) {
             isClosed = true;
-            /*for (int i = 0; i < shippings.length; i++) { // não sei se e necessário fechar cad shipment
+            for (int i = 0; i < shippings.length; i++) { // não sei se e necessário fechar cad shipment
                 shippings[i].setShipmentStatus(ShipmentStatus.CLOSED);
-            }*/
+            }
         }
     }
     

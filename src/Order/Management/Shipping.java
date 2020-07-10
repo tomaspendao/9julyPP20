@@ -5,11 +5,14 @@
  */
 package Order.Management;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import order.exceptions.ContainerException;
 import order.exceptions.OrderException;
 import order.exceptions.PositionException;
 import order.management.IShipping;
 import order.management.ShipmentStatus;
+import static order.management.ShipmentStatus.CLOSED;
 import order.packing.IContainer;
 import order.packing.IItemPacked;
 
@@ -23,59 +26,84 @@ import order.packing.IItemPacked;
  */
 public class Shipping implements IShipping {
 
+    private static final int MAX_CONTAINERS = 10;
+
     private IContainer[] containers;
     private ShipmentStatus shipmentStatus;
+    private int numberOfCont = 0;
     //private double cost;
     private final double pricePerCubicVolume; //não sei se e para colocar aqui
 
-    public Shipping(IContainer[] containers, ShipmentStatus shipmentStatus, double pricePerCubicVolume) {
-        this.containers = containers;
-        this.shipmentStatus = shipmentStatus;
+    public Shipping(ShipmentStatus shipmentStatus, double pricePerCubicVolume) {
+        containers = new IContainer[MAX_CONTAINERS];
+        try {
+            setShipmentStatus(shipmentStatus);
+        } catch (OrderException | ContainerException | PositionException ex) {
+            Logger.getLogger(Shipping.class.getName()).log(Level.SEVERE, null, ex);
+        }
         this.pricePerCubicVolume = pricePerCubicVolume;
         //this.cost = cost;
     }
 
-    public double getPricePerCubicVolume(){
+    public double getPricePerCubicVolume() {
         return pricePerCubicVolume;
     }
-    
+
     @Override
     public boolean addContainer(IContainer ic) throws OrderException, ContainerException {
         if (shipmentStatus != ShipmentStatus.IN_TREATMENT) {
             throw new OrderException("Not IN_TREATMENT") {
             };
         }
-        for (int j = 0; containers.length < 10; j++) {
-            if (containers[j] == ic) {
+        
+        for (int j = 0; j < numberOfCont; j++) {
+            if (containers[j].getReference().equals(ic.getReference()) == true) {
                 return false;
             }
         }
-        for (int i = 0; i < containers.length; i++) {
-            if (containers[i].isClosed() == false) {
-                throw new ContainerException("Container no closed") {
-                };
+        if(numberOfCont >= containers.length){
+            int size = containers.length;
+            size++;
+            IContainer[] temp = new IContainer[size];
+            int k = 0;
+            while (k<containers.length) {                
+                temp[k] = containers[k];
+                k++;
             }
-            if (containers[i] == null) {
-                containers[i] = ic;
-                return true;
-            }
-            IContainer[] temp;
-            int newInt = containers.length;
-            newInt = newInt * 2;
-            temp = new IContainer[newInt];
             containers = temp;
-            addContainer(ic);
         }
-
-        return false;
+        if (ic == null || ic.isClosed() == false) {
+            throw new ContainerException() {
+            };
+        }else{
+            containers[numberOfCont] = ic;
+            numberOfCont++;
+            return true;
+        }
     }
 
     @Override
     public boolean removeContainer(IContainer ic) throws OrderException, ContainerException {
-        for (int i = 0; i < containers.length; i++) {
-            if (containers[i] == ic) {
-                containers[i] = null;
-                return true;
+        if(ic == null) {
+            throw new ContainerException("value cant be null") {
+            };
+        }
+        if(shipmentStatus != ShipmentStatus.IN_TREATMENT){
+            throw new OrderException("Not in treatment") {
+            };
+        }
+        int k;
+        for (int i = 0; i < numberOfCont; i++) {
+            if(containers[i].getReference().equals(ic.getReference())){
+                k=i;
+                for (int j = 0; j < numberOfCont; j++) {
+                    k++;
+                    if (k>=numberOfCont) {
+                        containers[j] = null;
+                        numberOfCont--;
+                        return true;
+                    }
+                }
             }
         }
         return false;
@@ -84,7 +112,7 @@ public class Shipping implements IShipping {
     @Override
     public boolean existsContainer(IContainer ic) {
         for (int i = 0; containers.length < 10; i++) {
-            if (containers[i] == ic) {
+            if (containers[i].getReference().equals(ic.getReference())) {
                 return true;
             }
         }
@@ -92,9 +120,9 @@ public class Shipping implements IShipping {
     }
 
     @Override
-    public IContainer findContainer(String string) {
+    public IContainer findContainer(String reference) {
         for (IContainer container : containers) {
-            if (container.getReference().equals(string)) { //encontrar o contentor atraves da refrencia comparando as strings
+            if (container.getReference().equals(reference)) { //encontrar o contentor atraves da refrencia comparando as strings
                 return container;
             }
         }
@@ -200,26 +228,26 @@ public class Shipping implements IShipping {
                 str = str + "\n";
                 IItemPacked[] temppacked = containers[i].getPackedItems();
                 for (int j = 0; j < temppacked.length; j++) {
-                    if(temppacked[j] != null){
-                    //info dos itens
-                    str = str + "\tDescription:";
-                    str = str + String.valueOf(temppacked[j].getItem().getDescription());
-                    str = str + "\n";
-                    str = str + "\tVolume:";
-                    str = str + String.valueOf(temppacked[j].getItem().getVolume());
-                    str = str + "\n";
-                    str = str + "\tDepth:";
-                    str = str + String.valueOf(temppacked[j].getItem().getDepth());
-                    str = str + "\n";
-                    str = str + "\tHeight:";
-                    str = str + String.valueOf(temppacked[j].getItem().getHeight());
-                    str = str + "\n";
-                    str = str + "\tLenght:";
-                    str = str + String.valueOf(temppacked[j].getItem().getLenght());
-                    str = str + "\n";
-                    str = str + "\tReference:";
-                    str = str + String.valueOf(temppacked[j].getItem().getReference());
-                    str = str + "\n";
+                    if (temppacked[j] != null) {
+                        //info dos itens
+                        str = str + "\tDescription:";
+                        str = str + String.valueOf(temppacked[j].getItem().getDescription());
+                        str = str + "\n";
+                        str = str + "\tVolume:";
+                        str = str + String.valueOf(temppacked[j].getItem().getVolume());
+                        str = str + "\n";
+                        str = str + "\tDepth:";
+                        str = str + String.valueOf(temppacked[j].getItem().getDepth());
+                        str = str + "\n";
+                        str = str + "\tHeight:";
+                        str = str + String.valueOf(temppacked[j].getItem().getHeight());
+                        str = str + "\n";
+                        str = str + "\tLenght:";
+                        str = str + String.valueOf(temppacked[j].getItem().getLenght());
+                        str = str + "\n";
+                        str = str + "\tReference:";
+                        str = str + String.valueOf(temppacked[j].getItem().getReference());
+                        str = str + "\n";
                     }
                 }
             }

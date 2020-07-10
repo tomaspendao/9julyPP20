@@ -54,24 +54,24 @@ public class PP_ER_8170308 {
         //items[0] = item1;
         //items[1] = item2;
         
-        Order order1 = new Order(person1, customer1, items, 0, LocalDate.MAX, 1.0);
+        //Order order1 = new Order(person1, customer1, items, 0, LocalDate.MAX, 1.0);
         
                 
-        System.out.println(order1.getNumberOfItems());
+        //System.out.println(order1.getNumberOfItems());
         
         Container container1 = new Container(packes, "referencia", 12500, 50, 102, 50, Color.silver, Color.red, true);
         Container container2 = new Container(packe2, "outra_referencia", 125000, 50, 50, 50, Color.silver, Color.red, true);
         Container container3 = new Container(packes, "outra-_referencia", 50, 50, 50, 125000, Color.silver, Color.red, true);
         Container[] containers = {container1,container2};
        
-        Shipping shipping1 = new Shipping(containers, ShipmentStatus.SHIPPED, 12.0);
+        //Shipping shipping1 = new Shipping(containers, ShipmentStatus.SHIPPED, 12.0);
         //shipping1.addContainer(container3);
         
-        System.out.println(shipping1.summary());
-        System.out.println(shipping1.removeContainer(container2));
+        //System.out.println(shipping1.summary());
+        //System.out.println(shipping1.removeContainer(container2));
         container1.removeItem(item2);
         container1.removeItem(item1);
-        System.out.println(shipping1.summary());
+        //System.out.println(shipping1.summary());
         System.out.println(item1.getVolume());
         
     }

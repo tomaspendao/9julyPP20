@@ -26,14 +26,14 @@ public class ItemPacked extends Colored implements IItemPacked{
 
     public ItemPacked(IItem item, IPosition position, Color color, Color colorEdge) {
         super(color, colorEdge);
-        this.item = item;
-        this.position = position;
+        this.item = item;//????????????????
+        setPosition(position);
     }
     
     public ItemPacked(IItem item, IPosition position, Color color) {
         super(color, color);
         this.item = item;
-        this.position = position;
+        setPosition(position);
     }
 
     @Override
@@ -47,8 +47,8 @@ public class ItemPacked extends Colored implements IItemPacked{
     }
 
     @Override
-    public void setPosition(IPosition ip) {
-        this.position = ip;
+    public void setPosition(IPosition position) {
+        this.position = position;
     }
 
     

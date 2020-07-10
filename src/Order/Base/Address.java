@@ -25,11 +25,11 @@ public class Address implements IAddress{
     private String street;
 
     public Address(String city, String country, int number, String state, String street) {
-        this.city = city;
-        this.country = country;
-        this.number = number;
-        this.state = state;
-        this.street = street;
+        setCity(city);
+        setCountry(country);
+        setNumber(number);
+        setState(state);
+        setStreet(street);
     }
     
     
@@ -59,28 +59,28 @@ public class Address implements IAddress{
     }
 
     @Override
-    public void setCity(String string) {
-        this.city = string;
+    public void setCity(String city) {
+        this.city = city;
     }
 
     @Override
-    public void setCountry(String string) {
-        this.country = string;
+    public void setCountry(String country) {
+        this.country = country;
     }
 
     @Override
-    public void setNumber(int i) {
-        this.number = i;
+    public void setNumber(int num) {
+        this.number = num;
     }
 
     @Override
-    public void setState(String string) {
-        this.state = string;
+    public void setState(String state) {
+        this.state = state;
     }
 
     @Override
-    public void setStreet(String string) {
-        this.street = string;
+    public void setStreet(String street) {
+        this.street = street;
     }
     
 }

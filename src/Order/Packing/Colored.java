@@ -23,8 +23,8 @@ public class Colored implements IColored{
     private Color colorEdge;
 
     public Colored(Color color, Color colorEdge) {
-        this.color = color;
-        this.colorEdge = colorEdge;
+        setColor(color);
+        setColorEdge(colorEdge);
     }
     
     @Override

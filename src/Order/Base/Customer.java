@@ -27,8 +27,8 @@ public class Customer extends Person implements ICustomer{
     public Customer(int id, String vat, IAddress billingAddress, IAddress tempAddress, String tempName) {
         super(tempAddress, tempName);
         this.id = id;
-        this.vat = vat;
-        this.billingAddress = billingAddress;
+        setVat(vat);
+        setBillingAddress(billingAddress);
     }
  
 
@@ -43,8 +43,8 @@ public class Customer extends Person implements ICustomer{
     }
 
     @Override
-    public void setVat(String string) {
-        this.vat = string;
+    public void setVat(String vat) {
+        this.vat = vat;
     }
 
     @Override
@@ -53,8 +53,8 @@ public class Customer extends Person implements ICustomer{
     }
 
     @Override
-    public void setBillingAddress(IAddress ia) {
-        this.billingAddress = ia;
+    public void setBillingAddress(IAddress address) {
+        this.billingAddress = address;
     }
     
 }
