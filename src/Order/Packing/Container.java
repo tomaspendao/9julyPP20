@@ -8,6 +8,7 @@ package Order.Packing;
 import order.exceptions.ContainerException;
 import order.exceptions.PositionException;
 import order.packing.Color;
+import order.packing.IColored;
 import order.packing.IContainer;
 import order.packing.IItem;
 import order.packing.IItemPacked;
@@ -21,15 +22,15 @@ import order.packing.IPosition;
 * Nome: 
 * Número: 
  */
-public class Container implements IContainer {
+public class Container extends Box implements IContainer, IColored {
 
     private static final int MAX_ITENS_P = 10;
     private IItemPacked[] packedItems;
     private final String reference;
-    private final int volume;
-    private final int depth;  //--> x
-    private final int height; //--> y
-    private final int lenght; //--> z
+    private int volume;
+    private int depth;  //--> x
+    private int height; //--> y
+    private int lenght; //--> z
     private Color color;
     private Color colorEdge;
     private int currentVolume;
@@ -38,12 +39,9 @@ public class Container implements IContainer {
     private int currentNumberOfItems;
 
     public Container(String reference, int volume, int lenght, int height, int depth, Color color, Color colorEdge, boolean isClosed) {
+        super(depth,height,lenght,volume);
         packedItems = new IItemPacked[MAX_ITENS_P];
         this.reference = reference;
-        this.volume = volume;
-        this.lenght = lenght;
-        this.height = height;
-        this.depth = depth;
         this.color = color;
         this.colorEdge = colorEdge;
         this.isClosed = isClosed;
@@ -52,13 +50,12 @@ public class Container implements IContainer {
         }
     }
 
+    
+
     public Container(String reference, int volume, int lenght, int height, int depth, Color color, Color colorEdge, boolean isClosed, int occupiedVolume) {
+        super(depth,height,lenght,volume);
         packedItems = new IItemPacked[MAX_ITENS_P];
         this.reference = reference;
-        this.volume = volume;
-        this.lenght = lenght;
-        this.height = height;
-        this.depth = depth;
         this.color = color;
         this.colorEdge = colorEdge;
         this.isClosed = isClosed;
@@ -215,26 +212,6 @@ public class Container implements IContainer {
     @Override
     public boolean isClosed() {
         return isClosed;
-    }
-
-    @Override
-    public int getDepth() {
-        return depth;
-    }
-
-    @Override
-    public int getHeight() {
-        return height;
-    }
-
-    @Override
-    public int getLenght() {
-        return lenght;
-    }
-
-    @Override
-    public int getVolume() {
-        return volume;
     }
 
     @Override

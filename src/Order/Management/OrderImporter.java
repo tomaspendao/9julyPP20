@@ -15,6 +15,7 @@ import Order.Packing.Position;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import order.base.IAddress;
@@ -57,116 +58,87 @@ public class OrderImporter implements IOrderImporter {
         //JSON parser object to parse read file
         JSONParser jsonParser = new JSONParser();
 
-        try (FileReader reader = new FileReader("/Users/tomaspendao/Downloads/dist_students-4/ficheiroJSONExemplo/example.json")) {
-            //Read JSON file
+        try (FileReader reader = new FileReader("myJSON.json")) {
             Object obj = jsonParser.parse(reader);
+            JSONObject jsonObj = (JSONObject) obj;
 
-            JSONArray orderList = (JSONArray) obj;
-            //System.out.println(orderList);
+            //get Id from list
+            int id = (int) jsonObj.get("id");
+            iorder.setId(id);
+            //get date object from list
+            JSONObject dateObj = (JSONObject) jsonObj.get("date");
+            //get date values from dateObj
+            int day = (int) dateObj.get("day");
+            int month = (int) dateObj.get("month");
+            int year = (int) dateObj.get("year");
+            iorder.setDate(day, month, year);
 
-            for (Object o : orderList) {
-                
-                JSONObject order = (JSONObject) o;
-                //Get date object from list
-                JSONObject dateObject = (JSONObject) order.get("date");
-                //get day from date
-                int day = (int) dateObject.get("day");
-                //get month from date
-                int month = (int) dateObject.get("month");
-                //get year from  date
-                int year = (int) dateObject.get("year");
-                iorder.setDate(day, month, year);
-
-                //get customer object from list
-                JSONObject customerObject = (JSONObject) order.get("customer");
-                //get name from customer
-                String name = (String) customerObject.get("name");
-                iorder.getCustomer().setName(name);
-                //get vat from customer
-                String vat = (String) customerObject.get("vat");
-                iorder.getCustomer().setVat(vat);
-
-                //get address object from customer list
-                JSONObject addressObject = (JSONObject) customerObject.get("address");
-                //get country from address
-                String country = (String) addressObject.get("country");
-                iorder.getCustomer().getAddress().setCountry(country);
-                //get number from address
-                int number = (int) addressObject.get("number");
-                iorder.getCustomer().getAddress().setNumber(number);
-                //get street from address
-                String street = (String) addressObject.get("street");
-                iorder.getCustomer().getAddress().setStreet(street);
-                //get city from address
-                String city = (String) addressObject.get("city");
-                iorder.getCustomer().getAddress().setCity(city);
-                //get state from address
-                String state = (String) addressObject.get("state");
-                iorder.getCustomer().getAddress().setState(state);
-
-                //get billing address object from customer list
-                JSONObject billingAdrObject = (JSONObject) customerObject.get("billingAddress");
-                //get country from billing address
-                String country2 = (String) billingAdrObject.get("country");
-                iorder.getCustomer().getBillingAddress().setCountry(country2);
-                //get number from billing address
-                int number2 = (int) billingAdrObject.get("number");
-                iorder.getCustomer().getBillingAddress().setNumber(number2);
-                //get street from billing address
-                String street2 = (String) billingAdrObject.get("street");
-                iorder.getCustomer().getBillingAddress().setStreet(street2);
-                //get city from billing address
-                String city2 = (String) billingAdrObject.get("city");
-                iorder.getCustomer().getBillingAddress().setCity(city2);
-                //get state from billing address
-                String state2 = (String) billingAdrObject.get("state");
-                iorder.getCustomer().getBillingAddress().setState(state2);
-
-                //get destination object from list
-                JSONObject destinationObject = (JSONObject) order.get("destination");
-                //get name from destination
-                String namedest = (String) destinationObject.get("name");
-                iorder.getDestination().setName(namedest);
-
-                //get address object from destination list
-                JSONObject addressDestObject = (JSONObject) destinationObject.get("address");
-                //get country from address
-                String countryDest = (String) addressDestObject.get("country");
-                iorder.getDestination().getAddress().setCountry(countryDest);
-                //get number from address
-                int numberDest = (int) addressDestObject.get("number");
-                iorder.getDestination().getAddress().setNumber(numberDest);
-                //get street from address
-                String streetDest = (String) addressDestObject.get("street");
-                iorder.getDestination().getAddress().setStreet(streetDest);
-                //get city from address
-                String cityDest = (String) addressDestObject.get("city");
-                iorder.getDestination().getAddress().setCity(cityDest);
-                //get state from address
-                String stateDest = (String) addressDestObject.get("state");
-                iorder.getDestination().getAddress().setState(stateDest);
-
-                //get items Object from list
-                JSONObject itemsObject = (JSONObject) order.get("items");
-
-                //for (int i = 0; i < 10; i++) {
-                //get reference from items
-                String reference = (String) itemsObject.get("reference");
-                //get depth from items
-                int depth = (int) itemsObject.get("depth");
-                //get lenght from items
-                int lenght = (int) itemsObject.get("lenght");
-                //get height from items
-                int height = (int) itemsObject.get("height");
-                //get description from items
-                String description = (String) itemsObject.get("description");
-
-                IItem temp = new Item(reference, description, depth, height, lenght);
-                iorder.add(temp);
+            //get customer object from list
+            JSONObject customerObj = (JSONObject) jsonObj.get("customer");
+            //get values from customer Object
+            String nameCust = (String) customerObj.get("name");
+            String vat = (String) customerObj.get("vat");
+            //get address object from customer object
+            JSONObject addressCustObj = (JSONObject) customerObj.get("address");
+            //get values from address Object
+            String countryCustAddr = (String) addressCustObj.get("country");
+            int numberCustAddr = (int) addressCustObj.get("number");
+            String streetCustAddr = (String) addressCustObj.get("street");
+            String cityCustAddr = (String) addressCustObj.get("city");
+            String stateCustAddr = (String) addressCustObj.get("state");
+            
+            //get billing address object from customer object
+            JSONObject billingAddressCustObj = (JSONObject) customerObj.get("billingAddress");
+            //get values from billing Address object
+            String countryCustBillAddr = (String) billingAddressCustObj.get("country");
+            int numberCustBillAddr = (int) billingAddressCustObj.get("number");
+            String streetCustBillAddr = (String) billingAddressCustObj.get("street");
+            String cityCustBillAddr = (String) billingAddressCustObj.get("city");
+            String stateCustBillAddr = (String) billingAddressCustObj.get("state");
+            
+            //create address's
+            IAddress addressCust = new Address(cityCustAddr, countryCustAddr, numberCustAddr, stateCustAddr, streetCustAddr);
+            IAddress billingAddressCust = new Address(cityCustBillAddr, countryCustBillAddr, numberCustBillAddr, stateCustBillAddr, streetCustBillAddr);
+            //create costumer
+            ICustomer customer = new Customer(id, vat, billingAddressCust, addressCust, nameCust); //id???
+            
+            iorder.setCustomer(customer);
+            
+            //get destination from list
+            JSONObject destinationObj = (JSONObject) jsonObj.get("destination");
+            //get values from destination object
+            String nameDest = (String) destinationObj.get("name");
+            //get address object from destination object
+            JSONObject addressObj = (JSONObject) destinationObj.get("address");
+            //get values from address object
+            String countryDestAddr = (String) addressObj.get("country");
+            int numberDestAddr = (int) addressObj.get("number");
+            String streetDestAddr = (String) addressObj.get("street");
+            String cityDestAddr = (String) addressObj.get("city");
+            String stateDestAddr = (String) addressObj.get("state");
+            //create address
+            IAddress addressDest = new Address(cityDestAddr, countryDestAddr, numberDestAddr, stateDestAddr, streetDestAddr);
+            //create destination
+            IPerson destination = new Person(addressDest, nameDest);
+            
+            iorder.setDestination(destination);
+            
+            //get items array from list
+            
+            JSONArray itemsArray = (JSONArray) jsonObj.get("items");
+            JSONObject itemsObj = (JSONObject) jsonObj.get("items"); // criar um objecto porque o arraynão da para aceder
+            Iterator<String> iterator = itemsArray.iterator();
+            while (iterator.hasNext()) {
+                String reference = (String) itemsObj.get("reference");
+                int depth = (int) itemsObj.get("depth");
+                int length = (int) itemsObj.get("length");
+                int height = (int) itemsObj.get("height");
+                String description = (String) itemsObj.get("description");
+                IItem item = new Item(reference, description, depth, height, length);
+                iorder.add(item);
             }
 
         } catch (FileNotFoundException e) {
-        } catch (IOException | ParseException e) {
         }
     }
 
