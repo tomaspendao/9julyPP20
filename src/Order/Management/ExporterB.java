@@ -78,18 +78,25 @@ public class ExporterB implements IExporter {
         
         int arrayData[] = {resA_T, resCan, resClo, resI_T, resRec, resShi};
         String[] arrayStr = {"AWAITS_TREATMENT", "CANCELLED", "CLOSED", "IN_TREATMENT", "RECEIVED", "SHIPPED"};
+        JSONArray dataArray = new JSONArray();
+        for (int i = 0; i < arrayData.length; i++) {
+            dataArray.add(arrayData[i]);
+        }
+        JSONArray labelArray = new JSONArray();
+        for (int j = 0; j < arrayStr.length; j++) {
+            labelArray.add(arrayStr[j]);
+        }
 
         JSONObject obj = new JSONObject();
         JSONObject dataDetailsObj = new JSONObject();
         JSONArray jsonArray = new JSONArray();
         JSONObject dataObj = new JSONObject();
-        dataObj.put("data", arrayData);
-        JSONObject labelObj = new JSONObject();
-        labelObj.put("label", "percentage of each item status");
+        dataObj.put("data", dataArray);
+        dataObj.put("label", "percentage of each item status");
         jsonArray.add(dataObj);
-        jsonArray.add(labelObj);
+        
         dataDetailsObj.put("datasets", jsonArray);
-        dataDetailsObj.put("labels", arrayStr);
+        dataDetailsObj.put("labels", labelArray);
         obj.put("data", dataDetailsObj);
         obj.put("type", "bar");
         obj.put("title", "percentage of order in each status");

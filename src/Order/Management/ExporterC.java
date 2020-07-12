@@ -66,18 +66,26 @@ public class ExporterC implements IExporter {
             arrayNum[i] = countArray[i];
             customerArray[i] = customersFound[i].getName();
         }
-
+        
+        JSONArray dataArray = new JSONArray();
+        for (int i = 0; i < arrayNum.length; i++) {
+            dataArray.add(arrayNum[i]);
+        }
+        JSONArray labelArray = new JSONArray();
+        for (int j = 0; j < customerArray.length; j++) {
+            labelArray.add(customerArray[j]);
+        }
         JSONObject obj = new JSONObject();
         JSONObject dataDetailsObj = new JSONObject();
         JSONArray jsonArray = new JSONArray();
         JSONObject dataObj = new JSONObject();
-        dataObj.put("data", arrayNum);
-        JSONObject labelObj = new JSONObject();
-        labelObj.put("label", "customers");
+        dataObj.put("data", dataArray);
+        dataObj.put("label", "customers");
         jsonArray.add(dataObj);
-        jsonArray.add(labelObj);
+        
+        
         dataDetailsObj.put("datasets", jsonArray);
-        dataDetailsObj.put("labels", customerArray);
+        dataDetailsObj.put("labels", labelArray);
         obj.put("data", dataDetailsObj);
         obj.put("type", "bar");
         obj.put("title", "Number Of Orders Per Customer");

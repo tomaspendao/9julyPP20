@@ -46,21 +46,29 @@ public class ExporterA implements IExporter {
                 int total = orders[i].getNumberOfItems();
                 int part = orders[i].getNumberOfRemaingItemsToSend();
                 int res = (part * 100) / total;
-                
+
                 int arrayData[] = {res, 100 - res};
                 String[] arrayStr = {"To Send", "Sent"};
+                JSONArray labelArray = new JSONArray();
+                labelArray.add(arrayStr[0]);
+                labelArray.add(arrayStr[1]);
+                
+                JSONArray dataArray = new JSONArray();
+                for (int d = 0; d < arrayData.length; d++) {
+                    dataArray.add(arrayData[d]);
+                }
 
                 JSONObject obj = new JSONObject();
                 JSONObject dataDetailsObj = new JSONObject();
                 JSONArray jsonArray = new JSONArray();
                 JSONObject dataObj = new JSONObject();
-                dataObj.put("data", arrayData);
-                JSONObject labelObj = new JSONObject();
-                labelObj.put("label", "Percentage of Items to send");
+                dataObj.put("data", dataArray);
+                dataObj.put("label", "Percentage of Items to send");
                 jsonArray.add(dataObj);
-                jsonArray.add(labelObj);
+                
+                
                 dataDetailsObj.put("datasets", jsonArray);
-                dataDetailsObj.put("labels", arrayStr);
+                dataDetailsObj.put("labels", labelArray);
                 obj.put("data", dataDetailsObj);
                 obj.put("type", "pie");
                 obj.put("title", "Percentage of Items to send");

@@ -119,7 +119,7 @@ public class Exporter_3 implements IExporter {
         jsonObj.put("customer", customerObj);
         
         
-        try (FileWriter file = new FileWriter("ClientsAndOrders.json")) {
+        try (FileWriter file = new FileWriter("OrderDetails.json")) {
             file.write(jsonObj.toJSONString());
             file.flush();
         } catch (IOException e) {

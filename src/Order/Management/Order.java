@@ -49,7 +49,6 @@ public class Order implements IOrder {
         shippings = new IShipping[MAX_SHIPPING];
         items = new IItem[MAX_ITENS];
     }
-    
 
     public Order(IPerson destination, ICustomer customer, int id, LocalDate date, double orderPrice) {
         setDestination(destination);
@@ -207,6 +206,26 @@ public class Order implements IOrder {
 
     @Override
     public void validate() throws OrderException, ContainerException, PositionException {
+        int flag1 = 0;
+        int flag2 = 0;
+        for (int j = 0; j < numberOfItems; j++) {
+            items[j].getReference();
+            for (int s = 0; s < numberOfShippings; s++) {
+                IContainer[] tempCont = shippings[s].getContainers();
+                for (int c = 0; c < tempCont.length; c++) {
+                    if (tempCont[c].getItem(items[j].getReference()) == null) {
+                        flag1 = 0;
+                    } else {
+                        flag1 = 1;
+                    }
+                    
+                }
+            }
+            if (flag1 == 0) {
+                throw new OrderException("Item doesnt exist in any container") {
+                };
+            }
+        }
         for (int i = 0; i < shippings.length; i++) {
             shippings[i].validate();
         }
