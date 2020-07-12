@@ -29,22 +29,28 @@ import order.packing.IItemPacked;
 * Número: 
  */
 public class Order implements IOrder {
-    
+
     private static final int MAX_SHIPPING = 10;
     private static final int MAX_ITENS = 20;
-    
+
     private IPerson destination;
     private ICustomer customer;
     private IItem[] items;
     private int id;
     private LocalDate date;
     private IShipping[] shippings;
-    
+
     private int numberOfItems = 0;
     private int numberOfShippings = 0;
     private boolean isClosed = false;
     private double orderPrice;
+
+    public Order() {
+        shippings = new IShipping[MAX_SHIPPING];
+        items = new IItem[MAX_ITENS];
+    }
     
+
     public Order(IPerson destination, ICustomer customer, int id, LocalDate date, double orderPrice) {
         setDestination(destination);
         setCustomer(customer);
@@ -52,7 +58,7 @@ public class Order implements IOrder {
         setDate(date.getDayOfMonth(), date.getMonthValue(), date.getYear());
         this.numberOfItems = items.length;
         this.orderPrice = orderPrice;
-        
+
         shippings = new IShipping[MAX_SHIPPING];
         items = new IItem[MAX_ITENS];
     }
@@ -66,53 +72,51 @@ public class Order implements IOrder {
         shippings = new IShipping[MAX_SHIPPING];
     }
 
-    
-    
     @Override
     public IPerson getDestination() {
         return destination;
     }
-    
+
     @Override
     public void setDestination(IPerson person) {
         this.destination = person;
     }
-    
+
     @Override
     public ICustomer getCustomer() {
         return customer;
     }
-    
+
     @Override
     public void setCustomer(ICustomer customer) {
         this.customer = customer;
     }
-    
+
     @Override
     public IItem[] getItems() {
         return items;
     }
-    
+
     @Override
     public void setId(int id) {
         this.id = id;
     }
-    
+
     @Override
     public int getId() {
         return id;
     }
-    
+
     @Override
     public void setDate(int day, int month, int year) {
         this.date = LocalDate.of(year, month, day);
     }
-    
+
     @Override
     public LocalDate getDate() {
         return date;
     }
-    
+
     @Override
     public boolean add(IItem iitem) throws OrderException {
         for (int i = 0; i < numberOfItems; i++) {
@@ -120,7 +124,7 @@ public class Order implements IOrder {
                 return false;
             }
         }
-        if(numberOfItems >= items.length){
+        if (numberOfItems >= items.length) {
             int size = items.length;
             size = size * 2;
             IItem[] temp = new IItem[size];
@@ -135,40 +139,44 @@ public class Order implements IOrder {
             items[numberOfItems] = iitem;
             numberOfItems++;
             return true;
-        }else{
-            throw new OrderException("value cant be null") {};
+        } else {
+            throw new OrderException("value cant be null") {
+            };
         }
     }
-    
+
     @Override
     public IShipping[] getShippings() {
         return shippings;
     }
-    
+
     @Override
     public boolean addShipping(IShipping is) throws OrderException {
         if (numberOfShippings >= MAX_SHIPPING) {
             return false;
         }
         if (isClosed() == true || is == null) {
-            throw new OrderException() {};
-        }else{
+            throw new OrderException() {
+            };
+        } else {
             shippings[numberOfShippings] = is;
             numberOfShippings++;
             return true;
         }
-        
+
     }
-    
+
     @Override
     public boolean removeShipping(IShipping is) throws OrderException {
-        if(is == null){
-            throw new OrderException("value cant be null") {};
+        if (is == null) {
+            throw new OrderException("value cant be null") {
+            };
         }
         int k;
         for (int i = 0; i < numberOfShippings; i++) {
-            if (shippings[i].equals(is) == true) {
-                k=i;
+            //if (shippings[i].equals(is) == true) {
+            if (shippings[i].summary().equals(is.summary()) == true) {
+                k = i;
                 for (int j = k; j < numberOfShippings; j++) {
                     k++;
                     if (k >= numberOfShippings) {
@@ -184,7 +192,7 @@ public class Order implements IOrder {
         }
         return false;
     }
-    
+
     @Override
     public int clean() {
         int res = 0;
@@ -196,14 +204,14 @@ public class Order implements IOrder {
         }
         return res;
     }
-    
+
     @Override
     public void validate() throws OrderException, ContainerException, PositionException {
         for (int i = 0; i < shippings.length; i++) {
             shippings[i].validate();
         }
     }
-    
+
     @Override
     public void close() throws OrderException, ContainerException, PositionException {
         validate(); //try and catch?????????????
@@ -223,12 +231,12 @@ public class Order implements IOrder {
             }
         }
     }
-    
+
     @Override
     public boolean isClosed() {
         return isClosed;
     }
-    
+
     @Override
     public double getCost() {
         for (IShipping shipping : shippings) {
@@ -236,7 +244,7 @@ public class Order implements IOrder {
         }
         return orderPrice;
     }
-    
+
     @Override
     public String summary() {
         String str = "";
@@ -245,7 +253,7 @@ public class Order implements IOrder {
         }
         return str;
     }
-    
+
     @Override
     public int getNumberOfItems() {
         int count = 0;
@@ -256,7 +264,7 @@ public class Order implements IOrder {
         }
         return count;
     }
-    
+
     @Override
     public int getNumberOfRemaingItemsToSend() {
         int count = 0;
@@ -277,7 +285,7 @@ public class Order implements IOrder {
         }
         return count;
     }
-    
+
     @Override
     public IItem[] getRemainingItemsToSend() {
         int value = getNumberOfRemaingItemsToSend();
@@ -302,5 +310,5 @@ public class Order implements IOrder {
         }
         return itens;
     }
-    
+
 }

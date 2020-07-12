@@ -46,38 +46,36 @@ public class ExporterA implements IExporter {
                 int total = orders[i].getNumberOfItems();
                 int part = orders[i].getNumberOfRemaingItemsToSend();
                 int res = (part * 100) / total;
-
-                JSONObject jsonObj = new JSONObject();
+                
                 int arrayData[] = {res, 100 - res};
-                JSONArray datasetsArray = new JSONArray();
-                JSONObject dataObj = new JSONObject();
-                JSONObject labelObj = new JSONObject();
-                dataObj.put("data", arrayData);
-                labelObj.put("label", "Percentage of Items to send");
-                datasetsArray.add(dataObj);
-                datasetsArray.add(labelObj);
-
-                jsonObj.put("datasets", datasetsArray);
-
                 String[] arrayStr = {"To Send", "Sent"};
-                jsonObj.put("labels", arrayStr);
 
-                JSONObject firstObj = new JSONObject();
-                firstObj.put("data", jsonObj);
-                firstObj.put("type", "pie");
-                firstObj.put("title", "Percentage of Items to send");
+                JSONObject obj = new JSONObject();
+                JSONObject dataDetailsObj = new JSONObject();
+                JSONArray jsonArray = new JSONArray();
+                JSONObject dataObj = new JSONObject();
+                dataObj.put("data", arrayData);
+                JSONObject labelObj = new JSONObject();
+                labelObj.put("label", "Percentage of Items to send");
+                jsonArray.add(dataObj);
+                jsonArray.add(labelObj);
+                dataDetailsObj.put("datasets", jsonArray);
+                dataDetailsObj.put("labels", arrayStr);
+                obj.put("data", dataDetailsObj);
+                obj.put("type", "pie");
+                obj.put("title", "Percentage of Items to send");
 
-                try (FileWriter file = new FileWriter("PercentageOfItemsToSend" + "i" + ".json")) {
+                try (FileWriter file = new FileWriter("PercentageOfItemsToSend" + i + ".json")) {
 
-                    file.write(firstObj.toJSONString());
+                    file.write(obj.toJSONString());
                     file.flush();
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-                if (packing_gui.PackingGUI.validate("PercentageOfItemsToSend" + "i" + ".json") == true) {
-                    pathToFiles[j] = "PercentageOfItemsToSend" + "i" + ".json";
+                if (packing_gui.PackingGUI.validate("PercentageOfItemsToSend" + i + ".json") == true) {
+                    pathToFiles[j] = "PercentageOfItemsToSend" + i + ".json";
                     j++;
                 }
 

@@ -1,0 +1,52 @@
+{
+    "id": 1,
+    "date": {
+        "day": 1,
+        "month": 1,
+        "year": 2020
+    },
+    "customer": {
+        "name": "John Doe",
+        "vat": "111111",
+        "address": {
+            "country": "country A1",
+            "number": 1,
+            "street": "street A1",
+            "city": "city A1",
+            "state": "state A1"
+        },
+        "billingAddress": {
+            "country": "country A1",
+            "number": 1,
+            "street": "street A1",
+            "city": "city A1",
+            "state": "state A1"
+        }
+    },
+    "destination": {
+        "name": "Jane Doe",
+        "address": {
+            "country": "country A2",
+            "number": 2,
+            "street": "street A2",
+            "city": "city A2",
+            "state": "state A2"
+        }
+    },
+    "items": [
+        {
+            "reference": "ITEM2",
+            "depth": 1,
+            "length": 1,
+            "height": 1,
+            "description": "desc 1"
+        },
+        {
+            "reference": "ITEM1",
+            "depth": 1,
+            "length": 1,
+            "height": 1,
+            "description": "desc 1"
+        }
+    ]
+}

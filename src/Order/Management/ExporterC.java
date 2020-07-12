@@ -5,10 +5,12 @@
  */
 package Order.Management;
 
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import order.base.ICustomer;
 import order.management.IExporter;
 import order.management.IOrder;
 import org.json.simple.JSONArray;
@@ -22,71 +24,79 @@ import org.json.simple.parser.ParseException;
 *
 * Nome: 
 * Número: 
-*/
-public class ExporterC implements IExporter{
+ */
+public class ExporterC implements IExporter {
 
     private IOrder[] orders;
 
     public ExporterC(IOrder[] orders) {
         this.orders = orders;
     }
-    
+
     @Override
     public void export() throws IOException {
-        String[] pathToFiles = null;
-        int[] foundIds = null;
+        ICustomer customersFound[] = new ICustomer[orders.length];
+        int numFound = 0;
+        int countArray[] = new int[orders.length];
         for (int i = 0; i < orders.length; i++) {
-            for (int j = 0; j < foundIds.length; j++) {
-                int countCustomer = 0;
-                if(orders[i].getCustomer().getCustomerId() == foundIds[j]){
+            int count = 1;
+            int flag = 0;
+            ICustomer tempCust = orders[i].getCustomer();
+            for (int c = 0; c < numFound; c++) {
+                if (customersFound[c].getCustomerId() == tempCust.getCustomerId()) {
+                    flag = 1;
                     break;
                 }
-                int k = i + 1;
-                for (k = 0; k < orders.length; k++) {
-                    if(orders[k].getCustomer().getCustomerId() == foundIds[j]){
-                        countCustomer++;
-                    }
-                }
-                JSONObject obj = new JSONObject();
-                int[] arrayData = {orders.length,countCustomer};
-                obj.put("data", arrayData);
-                obj.put("label", "Customer and number of orders");
-                
-                JSONObject datasetobject = new JSONObject();
-                datasetobject.put("datasets", obj);
-                datasetobject.put("label", "Customer and number of orders");
-                
-                JSONObject dataObject = new JSONObject();
-                dataObject.put("data", datasetobject);
-                dataObject.put("type", "pie");
-                dataObject.put("title", "Customer and number of orders");
-                
-                JSONArray dataArray = new JSONArray();
-                dataArray.add(dataObject);
-                
-                try (FileWriter file = new FileWriter("/Users/Shared/ClientsAndOrders" + i + ".json")){
-                    file.write(dataArray.toJSONString());
-                    file.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                
-                if(packing_gui.PackingGUI.validate("/Users/Shared/ClientsAndOrders" + i + ".json") == true){
-                    for (String pathToFile : pathToFiles) {
-                        if (pathToFile == null) {
-                            pathToFiles[i] = "/Users/Shared/ClientsAndOrders" + i + ".json";
-                        }
+            }
+            if (flag == 0) {
+                customersFound[numFound] = tempCust;
+                //numFound++;
+                for (int j = i + 1; j < orders.length; j++) {
+                    if (orders[j].getCustomer().getCustomerId() == tempCust.getCustomerId()) {
+                        count++;
                     }
                 }
             }
-            
-            
+            countArray[numFound] = count;
+            numFound++;
         }
-        try {
-            packing_gui.PackingGUI.render(pathToFiles);
-        } catch (IOException | ParseException ex) {
-            Logger.getLogger(ExporterA.class.getName()).log(Level.SEVERE, null, ex);
+        int arrayNum[] = new int[numFound];
+        String customerArray[] = new String[numFound];
+        for (int i = 0; i < numFound; i++) {
+            arrayNum[i] = countArray[i];
+            customerArray[i] = customersFound[i].getName();
         }
+
+        JSONObject obj = new JSONObject();
+        JSONObject dataDetailsObj = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+        JSONObject dataObj = new JSONObject();
+        dataObj.put("data", arrayNum);
+        JSONObject labelObj = new JSONObject();
+        labelObj.put("label", "customers");
+        jsonArray.add(dataObj);
+        jsonArray.add(labelObj);
+        dataDetailsObj.put("datasets", jsonArray);
+        dataDetailsObj.put("labels", customerArray);
+        obj.put("data", dataDetailsObj);
+        obj.put("type", "bar");
+        obj.put("title", "Number Of Orders Per Customer");
+
+        try (FileWriter file = new FileWriter("ClientsAndOrders.json")) {
+            file.write(obj.toJSONString());
+            file.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        if(packing_gui.PackingGUI.validate("ClientsAndOrders.json") == true){
+            try {
+                packing_gui.PackingGUI.render("ClientsAndOrders.json");
+            } catch (FileNotFoundException | ParseException ex) {
+                Logger.getLogger(ExporterB.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
     }
-    
+
 }

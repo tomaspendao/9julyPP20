@@ -54,23 +54,24 @@ public class OrderImporter implements IOrderImporter {
     @Override
     @SuppressWarnings("null")
     public void importData(IOrder iorder, String string) throws IOException, ParseException, ContainerException, OrderException, PositionException {
+        //iorder = new Order();
         //importar o json importado com o caminho string;
         //JSON parser object to parse read file
         JSONParser jsonParser = new JSONParser();
 
-        try (FileReader reader = new FileReader("myJSON.json")) {
+        try (FileReader reader = new FileReader(string)) {
             Object obj = jsonParser.parse(reader);
             JSONObject jsonObj = (JSONObject) obj;
 
             //get Id from list
-            int id = (int) jsonObj.get("id");
+            int id = Integer.parseInt(jsonObj.get("id").toString());
             iorder.setId(id);
             //get date object from list
             JSONObject dateObj = (JSONObject) jsonObj.get("date");
             //get date values from dateObj
-            int day = (int) dateObj.get("day");
-            int month = (int) dateObj.get("month");
-            int year = (int) dateObj.get("year");
+            int day = Integer.parseInt(dateObj.get("day").toString());
+            int month = Integer.parseInt(dateObj.get("month").toString());
+            int year = Integer.parseInt(dateObj.get("year").toString());
             iorder.setDate(day, month, year);
 
             //get customer object from list
@@ -82,7 +83,7 @@ public class OrderImporter implements IOrderImporter {
             JSONObject addressCustObj = (JSONObject) customerObj.get("address");
             //get values from address Object
             String countryCustAddr = (String) addressCustObj.get("country");
-            int numberCustAddr = (int) addressCustObj.get("number");
+            int numberCustAddr =  Integer.parseInt(addressCustObj.get("number").toString());
             String streetCustAddr = (String) addressCustObj.get("street");
             String cityCustAddr = (String) addressCustObj.get("city");
             String stateCustAddr = (String) addressCustObj.get("state");
@@ -91,7 +92,7 @@ public class OrderImporter implements IOrderImporter {
             JSONObject billingAddressCustObj = (JSONObject) customerObj.get("billingAddress");
             //get values from billing Address object
             String countryCustBillAddr = (String) billingAddressCustObj.get("country");
-            int numberCustBillAddr = (int) billingAddressCustObj.get("number");
+            int numberCustBillAddr = Integer.parseInt(billingAddressCustObj.get("number").toString());
             String streetCustBillAddr = (String) billingAddressCustObj.get("street");
             String cityCustBillAddr = (String) billingAddressCustObj.get("city");
             String stateCustBillAddr = (String) billingAddressCustObj.get("state");
@@ -112,7 +113,7 @@ public class OrderImporter implements IOrderImporter {
             JSONObject addressObj = (JSONObject) destinationObj.get("address");
             //get values from address object
             String countryDestAddr = (String) addressObj.get("country");
-            int numberDestAddr = (int) addressObj.get("number");
+            int numberDestAddr = Integer.parseInt(addressObj.get("number").toString());
             String streetDestAddr = (String) addressObj.get("street");
             String cityDestAddr = (String) addressObj.get("city");
             String stateDestAddr = (String) addressObj.get("state");
@@ -126,13 +127,12 @@ public class OrderImporter implements IOrderImporter {
             //get items array from list
             
             JSONArray itemsArray = (JSONArray) jsonObj.get("items");
-            JSONObject itemsObj = (JSONObject) jsonObj.get("items"); // criar um objecto porque o arraynão da para aceder
-            Iterator<String> iterator = itemsArray.iterator();
-            while (iterator.hasNext()) {
+            for (int i = 0; i < itemsArray.size(); i++) {                
+                JSONObject itemsObj = (JSONObject) itemsArray.get(i);
                 String reference = (String) itemsObj.get("reference");
-                int depth = (int) itemsObj.get("depth");
-                int length = (int) itemsObj.get("length");
-                int height = (int) itemsObj.get("height");
+                int depth = Integer.parseInt(itemsObj.get("depth").toString());
+                int length = Integer.parseInt(itemsObj.get("length").toString());
+                int height = Integer.parseInt(itemsObj.get("height").toString());
                 String description = (String) itemsObj.get("description");
                 IItem item = new Item(reference, description, depth, height, length);
                 iorder.add(item);

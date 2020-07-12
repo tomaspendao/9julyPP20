@@ -75,41 +75,38 @@ public class ExporterB implements IExporter {
         resI_T = (resI_T * 100) / total;
         resRec = (resRec * 100) / total;
         resShi = (resShi * 100) / total;
+        
+        int arrayData[] = {resA_T, resCan, resClo, resI_T, resRec, resShi};
+        String[] arrayStr = {"AWAITS_TREATMENT", "CANCELLED", "CLOSED", "IN_TREATMENT", "RECEIVED", "SHIPPED"};
 
         JSONObject obj = new JSONObject();
-        int arrayData[] = {resA_T, resCan, resClo, resI_T, resRec, resShi};
+        JSONObject dataDetailsObj = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+        JSONObject dataObj = new JSONObject();
+        dataObj.put("data", arrayData);
+        JSONObject labelObj = new JSONObject();
+        labelObj.put("label", "percentage of each item status");
+        jsonArray.add(dataObj);
+        jsonArray.add(labelObj);
+        dataDetailsObj.put("datasets", jsonArray);
+        dataDetailsObj.put("labels", arrayStr);
+        obj.put("data", dataDetailsObj);
+        obj.put("type", "bar");
+        obj.put("title", "percentage of order in each status");
+        
 
-        JSONArray datasetsArray = new JSONArray();
+        try (FileWriter file = new FileWriter("PercentageOfOrdersInEachStatus.json")) {
 
-        JSONObject obj2 = new JSONObject();
-        JSONObject obj3 = new JSONObject();
-        obj2.put("data", arrayData);
-        obj3.put("label", "percentage of each item status");
-        datasetsArray.add(obj2);
-        datasetsArray.add(obj3);
-
-        obj.put("datasets", datasetsArray);
-
-        String[] arrayStr = {"AWAITS_TREATMENT", "CANCELLED", "CLOSED", "IN_TREATMENT", "RECEIVED", "SHIPPED"};
-        obj.put("labels", arrayStr);
-
-        JSONObject firstObj = new JSONObject();
-        firstObj.put("data", obj);
-        firstObj.put("type", "pie");
-        firstObj.put("title", "percentage of order in each status");
-
-        try (FileWriter file = new FileWriter("PercentageOfOrdersInEachStatus" + "i" + ".json")) {
-
-            file.write(firstObj.toJSONString());
+            file.write(obj.toJSONString());
             file.flush();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        if(packing_gui.PackingGUI.validate("PercentageOfOrdersInEachStatus" + "i" + ".json") == true){
+        if(packing_gui.PackingGUI.validate("PercentageOfOrdersInEachStatus.json") == true){
             try {
-                packing_gui.PackingGUI.render("PercentageOfOrdersInEachStatus" + "i" + ".json");
+                packing_gui.PackingGUI.render("PercentageOfOrdersInEachStatus.json");
             } catch (FileNotFoundException | ParseException ex) {
                 Logger.getLogger(ExporterB.class.getName()).log(Level.SEVERE, null, ex);
             }

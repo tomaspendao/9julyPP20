@@ -42,7 +42,16 @@ public class Shipping implements IShipping {
             Logger.getLogger(Shipping.class.getName()).log(Level.SEVERE, null, ex);
         }
         this.pricePerCubicVolume = pricePerCubicVolume;
-        //this.cost = cost;
+    }
+    
+    public Shipping(ShipmentStatus shipmentStatus) {
+        containers = new IContainer[MAX_CONTAINERS];
+        try {
+            setShipmentStatus(shipmentStatus);
+        } catch (OrderException | ContainerException | PositionException ex) {
+            Logger.getLogger(Shipping.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        this.pricePerCubicVolume = 12.00;
     }
 
     public double getPricePerCubicVolume() {
